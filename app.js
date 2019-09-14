@@ -24,6 +24,7 @@ mongoose.connect(config.MONGODB_BLOG_URI, { useNewUrlParser:true, useUnifiedTopo
   })
 app.use(cors())
 app.use(bodyParser.json())
-app.use('/app/blogs', blogsRouter)
 
+
+app.use('/api/blogs', blogsRouter)
 module.exports = app
