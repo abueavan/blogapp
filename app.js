@@ -4,15 +4,10 @@ const app = express()
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const blogsRouter = require('./controllers/blogs')
+const userRouter = require('./controllers/users')
+const loginRouter = require('./controllers/login')
 const mongoose = require('mongoose')
-const morgan = require('morgan')
-morgan.token('post', (request) => {
-  if(request.method === 'POST' || request.method === 'PUT') {
-    return JSON.stringify(request.body)
-  }
-})
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post'))
-
+const middleware = require('./utils/middleware')
 
 
 mongoose.connect(config.MONGODB_BLOG_URI, { useNewUrlParser:true, useUnifiedTopology: true, useFindAndModify:false, useCreateIndex: true })
@@ -24,7 +19,14 @@ mongoose.connect(config.MONGODB_BLOG_URI, { useNewUrlParser:true, useUnifiedTopo
   })
 app.use(cors())
 app.use(bodyParser.json())
-
+app.use(middleware.morganp)
+app.use(middleware.tokenExtractor)
 
 app.use('/api/blogs', blogsRouter)
+app.use('/api/users', userRouter)
+app.use('/api/login', loginRouter)
+
+app.use(middleware.unknownEndpoint)
+app.use(middleware.errorHandler)
+
 module.exports = app
